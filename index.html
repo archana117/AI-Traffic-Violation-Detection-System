@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DriverNet AI — Autonomous Driving Intelligence</title>
+    <meta name="description" content="DriverNet AI: A behavioral cloning CNN for autonomous vehicle steering, powered by the NVIDIA architecture and PyTorch.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-glow bg-glow-3"></div>
+
+    <!-- Navigation -->
+    <nav id="main-nav">
+        <div class="nav-brand">
+            <div class="nav-logo">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                    <circle cx="14" cy="14" r="12" stroke="url(#logo-grad)" stroke-width="2.5"/>
+                    <path d="M8 14 L14 8 L20 14 L14 20 Z" fill="url(#logo-grad)" opacity="0.6"/>
+                    <circle cx="14" cy="14" r="3" fill="url(#logo-grad)"/>
+                    <defs><linearGradient id="logo-grad" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs>
+                </svg>
+            </div>
+            <span class="nav-title">DriverNet<span class="nav-ai">AI</span></span>
+        </div>
+        <div class="nav-links">
+            <a href="#hero" class="nav-link active">Home</a>
+            <a href="#simulator" class="nav-link">Simulator</a>
+            <a href="#architecture" class="nav-link">Architecture</a>
+            <a href="#pipeline" class="nav-link">Pipeline</a>
+            <a href="#training" class="nav-link">Training</a>
+        </div>
+        <div class="nav-status">
+            <span class="status-dot"></span>
+            <span class="status-text">System Online</span>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero">
+        <div class="hero-content">
+            <div class="hero-badge">BEHAVIORAL CLONING · NVIDIA CNN · PYTORCH</div>
+            <h1 class="hero-title">
+                Autonomous Driving<br>
+                <span class="gradient-text">Intelligence System</span>
+            </h1>
+            <p class="hero-subtitle">
+                End-to-end deep learning for self-driving vehicles. Our CNN processes raw camera feeds 
+                and predicts precise steering angles in real-time, learning directly from human driving behavior.
+            </p>
+            <div class="hero-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-params">0</div>
+                    <div class="stat-label">Parameters</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-fps">0</div>
+                    <div class="stat-label">FPS Inference</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-layers">0</div>
+                    <div class="stat-label">Network Layers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-accuracy">0</div>
+                    <div class="stat-label">MSE Loss</div>
+                </div>
+            </div>
+            <div class="hero-actions">
+                <a href="#simulator" class="btn btn-primary" id="btn-launch">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    Launch Simulator
+                </a>
+                <a href="#architecture" class="btn btn-secondary" id="btn-explore">
+                    Explore Architecture
+                </a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <canvas id="neural-canvas" width="500" height="400"></canvas>
+        </div>
+    </section>
+
+    <!-- Live Simulator Section -->
+    <section id="simulator">
+        <div class="section-header">
+            <div class="section-badge">INTERACTIVE</div>
+            <h2 class="section-title">Driving <span class="gradient-text">Simulator</span></h2>
+            <p class="section-desc">Experience real-time AI steering predictions. Use the slider or arrow keys to simulate road curvature.</p>
+        </div>
+        <div class="simulator-container">
+            <div class="sim-panel sim-road-panel">
+                <div class="panel-header">
+                    <span class="panel-dot green"></span>
+                    <span class="panel-title">Camera Feed — Center</span>
+                    <span class="panel-badge">LIVE</span>
+                </div>
+                <canvas id="road-canvas" width="640" height="360"></canvas>
+                <div class="sim-controls">
+                    <label for="curvature-slider" class="control-label">Road Curvature</label>
+                    <input type="range" id="curvature-slider" min="-100" max="100" value="0" class="slider">
+                    <div class="control-values">
+                        <span>← Left</span>
+                        <span id="curvature-value" class="control-current">0.00</span>
+                        <span>Right →</span>
+                    </div>
+                </div>
+            </div>
+            <div class="sim-right-stack">
+                <div class="sim-panel sim-steering-panel">
+                    <div class="panel-header">
+                        <span class="panel-dot cyan"></span>
+                        <span class="panel-title">AI Steering Output</span>
+                    </div>
+                    <canvas id="steering-canvas" width="320" height="200"></canvas>
+                    <div class="steering-readout">
+                        <div class="readout-item">
+                            <span class="readout-label">Angle</span>
+                            <span class="readout-value" id="steering-angle">0.000°</span>
+                        </div>
+                        <div class="readout-item">
+                            <span class="readout-label">Throttle</span>
+                            <span class="readout-value" id="throttle-value">0.85</span>
+                        </div>
+                        <div class="readout-item">
+                            <span class="readout-label">Speed</span>
+                            <span class="readout-value" id="speed-value">18 mph</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="sim-panel sim-preprocess-panel">
+                    <div class="panel-header">
+                        <span class="panel-dot purple"></span>
+                        <span class="panel-title">Preprocessed Input (66×200 YUV)</span>
+                    </div>
+                    <canvas id="preprocess-canvas" width="320" height="110"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Section -->
+    <section id="architecture">
+        <div class="section-header">
+            <div class="section-badge">DEEP LEARNING</div>
+            <h2 class="section-title">Network <span class="gradient-text">Architecture</span></h2>
+            <p class="section-desc">Based on the NVIDIA end-to-end learning architecture, DriverNet uses 5 convolutional layers and 4 fully connected layers.</p>
+        </div>
+        <div class="arch-container">
+            <div class="arch-flow">
+                <div class="arch-node arch-input" id="arch-node-input">
+                    <div class="arch-node-icon">📷</div>
+                    <div class="arch-node-name">Input</div>
+                    <div class="arch-node-detail">3 × 66 × 200</div>
+                    <div class="arch-node-sub">RGB → YUV</div>
+                </div>
+                <div class="arch-arrow"><div class="arch-arrow-line"></div></div>
+                <div class="arch-node arch-conv" id="arch-node-conv1">
+                    <div class="arch-node-icon">◈</div>
+                    <div class="arch-node-name">Conv2D</div>
+                    <div class="arch-node-detail">24 @ 5×5, s=2</div>
+                    <div class="arch-node-sub">+ ELU</div>
+                </div>
+                <div class="arch-arrow"><div class="arch-arrow-line"></div></div>
+                <div class="arch-node arch-conv" id="arch-node-conv2">
+                    <div class="arch-node-icon">◈</div>
+                    <div class="arch-node-name">Conv2D</div>
+                    <div class="arch-node-detail">36 @ 5×5, s=2</div>
+                    <div class="arch-node-sub">+ ELU</div>
+                </div>
+                <div class="arch-arrow"><div class="arch-arrow-line"></div></div>
+                <div class="arch-node arch-conv" id="arch-node-conv3">
+                    <div class="arch-node-icon">◈</div>
+                    <div class="arch-node-name">Conv2D</div>
+                    <div class="arch-node-detail">48 @ 5×5, s=2</div>
+                    <div class="arch-node-sub">+ ELU</div>
+                </div>
+                <div class="arch-arrow"><div class="arch-arrow-line"></div></div>
+                <div class="arch-node arch-conv" id="arch-node-conv4">
+                    <div class="arch-node-icon">◈</div>
+                    <div class="arch-node-name">Conv2D</div>
+                    <div class="arch-node-detail">64 @ 3×3, s=1</div>
+                    <div class="arch-node-sub">+ ELU</div>
+                </div>
+                <div class="arch-arrow"><div class="arch-arrow-line"></div></div>
+                <div class="arch-node arch-conv" id="arch-node-conv5">
+                    <div class="arch-node-icon">◈</div>
+                    <div class="arch-node-name">Conv2D</div>
+                    <div class="arch-node-detail">64 @ 3×3, s=1</div>
+                    <div class="arch-node-sub">+ ELU + Drop</div>
+                </div>
+                <div class="arch-arrow"><div class="arch-arrow-line"></div></div>
+                <div class="arch-node arch-fc" id="arch-node-fc1">
+                    <div class="arch-node-icon">⬡</div>
+                    <div class="arch-node-name">FC</div>
+                    <div class="arch-node-detail">1152 → 100</div>
+                    <div class="arch-node-sub">+ ELU + Drop</div>
+                </div>
+                <div class="arch-arrow"><div class="arch-arrow-line"></div></div>
+                <div class="arch-node arch-fc" id="arch-node-fc2">
+                    <div class="arch-node-icon">⬡</div>
+                    <div class="arch-node-name">FC</div>
+                    <div class="arch-node-detail">100 → 64</div>
+                    <div class="arch-node-sub">+ ELU</div>
+                </div>
+                <div class="arch-arrow"><div class="arch-arrow-line"></div></div>
+                <div class="arch-node arch-fc" id="arch-node-fc3">
+                    <div class="arch-node-icon">⬡</div>
+                    <div class="arch-node-name">FC</div>
+                    <div class="arch-node-detail">64 → 10</div>
+                    <div class="arch-node-sub">+ ELU</div>
+                </div>
+                <div class="arch-arrow"><div class="arch-arrow-line"></div></div>
+                <div class="arch-node arch-output" id="arch-node-output">
+                    <div class="arch-node-icon">🎯</div>
+                    <div class="arch-node-name">Output</div>
+                    <div class="arch-node-detail">1 (steering)</div>
+                    <div class="arch-node-sub">Continuous</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pipeline Section -->
+    <section id="pipeline">
+        <div class="section-header">
+            <div class="section-badge">DATA PROCESSING</div>
+            <h2 class="section-title">Augmentation <span class="gradient-text">Pipeline</span></h2>
+            <p class="section-desc">Robust data augmentation ensures the model generalizes across diverse road conditions.</p>
+        </div>
+        <div class="pipeline-grid">
+            <div class="pipeline-card" id="pipe-crop">
+                <div class="pipe-icon">✂️</div>
+                <h3 class="pipe-title">Crop</h3>
+                <p class="pipe-desc">Remove sky and car hood from the frame. Focus the CNN on the road surface and lane markings only.</p>
+                <div class="pipe-code"><code>image[60:-25, :, :]</code></div>
+            </div>
+            <div class="pipeline-card" id="pipe-resize">
+                <div class="pipe-icon">📐</div>
+                <h3 class="pipe-title">Resize</h3>
+                <p class="pipe-desc">Scale down to 66×200 pixels using area interpolation for optimal feature extraction.</p>
+                <div class="pipe-code"><code>cv2.resize(img, (200, 66))</code></div>
+            </div>
+            <div class="pipeline-card" id="pipe-yuv">
+                <div class="pipe-icon">🎨</div>
+                <h3 class="pipe-title">RGB → YUV</h3>
+                <p class="pipe-desc">Convert to YUV color space. Separates luminance from chrominance, matching NVIDIA's approach.</p>
+                <div class="pipe-code"><code>cv2.cvtColor(img, RGB2YUV)</code></div>
+            </div>
+            <div class="pipeline-card" id="pipe-flip">
+                <div class="pipe-icon">🔄</div>
+                <h3 class="pipe-title">Random Flip</h3>
+                <p class="pipe-desc">Horizontally flip with 50% probability and negate the steering angle to balance left/right turns.</p>
+                <div class="pipe-code"><code>cv2.flip(img, 1)</code></div>
+            </div>
+            <div class="pipeline-card" id="pipe-translate">
+                <div class="pipe-icon">↔️</div>
+                <h3 class="pipe-title">Translation</h3>
+                <p class="pipe-desc">Random shift simulates off-center driving and teaches recovery behavior.</p>
+                <div class="pipe-code"><code>cv2.warpAffine(img, M, …)</code></div>
+            </div>
+            <div class="pipeline-card" id="pipe-brightness">
+                <div class="pipe-icon">☀️</div>
+                <h3 class="pipe-title">Brightness</h3>
+                <p class="pipe-desc">Randomly adjust brightness in HSV space to handle varying lighting conditions.</p>
+                <div class="pipe-code"><code>hsv[:,:,2] *= ratio</code></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Training Section -->
+    <section id="training">
+        <div class="section-header">
+            <div class="section-badge">OPTIMIZATION</div>
+            <h2 class="section-title">Training <span class="gradient-text">Dashboard</span></h2>
+            <p class="section-desc">Simulated training loop with RAdam optimizer and MSE loss. Watch the model converge in real-time.</p>
+        </div>
+        <div class="training-container">
+            <div class="training-chart-panel">
+                <div class="panel-header">
+                    <span class="panel-dot green"></span>
+                    <span class="panel-title">Loss Convergence</span>
+                    <button class="btn-train" id="btn-start-training">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        Start Training
+                    </button>
+                </div>
+                <canvas id="loss-chart" width="700" height="300"></canvas>
+                <div class="chart-legend">
+                    <span class="legend-item"><span class="legend-dot train"></span>Train Loss</span>
+                    <span class="legend-item"><span class="legend-dot val"></span>Val Loss</span>
+                </div>
+            </div>
+            <div class="training-info-panel">
+                <div class="panel-header">
+                    <span class="panel-dot cyan"></span>
+                    <span class="panel-title">Hyperparameters</span>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Optimizer</span>
+                        <span class="info-value">RAdam</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Learning Rate</span>
+                        <span class="info-value">1e-4</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Batch Size</span>
+                        <span class="info-value">64</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Epochs</span>
+                        <span class="info-value" id="epoch-display">0 / 40</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Loss Fn</span>
+                        <span class="info-value">MSE</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Dropout</span>
+                        <span class="info-value">0.5 / 0.4</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Train Loss</span>
+                        <span class="info-value" id="train-loss-val">—</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Val Loss</span>
+                        <span class="info-value" id="val-loss-val">—</span>
+                    </div>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="training-progress"></div>
+                </div>
+                <div class="training-status" id="training-status">Ready to train</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <span class="nav-title">DriverNet<span class="nav-ai">AI</span></span>
+                <p class="footer-desc">End-to-end learning for autonomous driving. Built with PyTorch.</p>
+            </div>
+            <div class="footer-tech">
+                <span class="tech-tag">PyTorch</span>
+                <span class="tech-tag">OpenCV</span>
+                <span class="tech-tag">NVIDIA CNN</span>
+                <span class="tech-tag">RAdam</span>
+                <span class="tech-tag">Socket.IO</span>
+                <span class="tech-tag">Flask</span>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 DriverNet AI · Behavioral Cloning Project</span>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
