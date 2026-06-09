@@ -1,4 +1,4 @@
-# AI-Traffic-Violation-Detection-System
+DriverNet AI– Autonomous Driving System
 
 DriverNet AI is a deep learning-based autonomous driving system that predicts vehicle steering angles from road images using a Convolutional Neural Network (CNN). Inspired by NVIDIA's end-to-end behavioral cloning architecture, the model learns driving behavior directly from human driving data and enables real-time self-driving car simulation.
 
